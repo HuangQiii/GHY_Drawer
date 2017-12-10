@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\cloud_main_app\react-native-splash-screen\unspecified\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="8157618a5b248f10354e1dbfa44ddef9e617da42">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\cloud_main_app-react-native-splash-screen-unspecified_25e52164c5dc86337e85d43b95f5911bc64147e2.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.facebook.fbui.textlayoutbuilder\textlayoutbuilder\1.0.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="f90b593491e4044903f0bbf68dc3fa2790b151b9">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.facebook.fbui.textlayoutbuilder-textlayoutbuilder-1.0.0_69c917ac1b0fa2d18ad77e542765fa69f9ff23f1.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Huang_Q\.m2\repository\javax\inject\javax.inject\1\javax.inject-1.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="6975da39a7040257bd51d21a231b76c915872d38">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\javax.inject-1_f2d7eb7645f0c96d9efaa5800a5e001f04bcd692.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.facebook.react\react-native\0.50.3\jars\libs\infer-annotations-4.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="9809e90be788acdb479b2b44e2112f3295a03068">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\infer-annotations-4.0_40befcf6199a4c9d0bb509c928cc4e743f44aa27.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.facebook.soloader\soloader\0.1.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="8f615bca00639150c9eb6175d4b5471193f70794">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.facebook.soloader-soloader-0.1.0_db85cc41704f9152dc9d9b67e246214fb559ae6e.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Huang_Q\.gradle\caches\modules-2\files-2.1\com.squareup.okhttp3\okhttp-urlconnection\3.6.0\3f9b16b774f2c36cfd86dd2053d0b3059531dacc\okhttp-urlconnection-3.6.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="3f9b16b774f2c36cfd86dd2053d0b3059531dacc">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\okhttp-urlconnection-3.6.0_ada751bcd82dc47f25c8f6fadeba98c89bbd522c.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.facebook.fresco\fresco\1.3.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="fe85b87215e405f5917d40ae4960488ac9224b74">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.facebook.fresco-fresco-1.3.0_4b7e561e51de1f70ae06eb88733c9be461e03699.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Huang_Q\.gradle\caches\modules-2\files-2.1\com.google.code.findbugs\jsr305\3.0.0\5871fb60dc68d67da54a663c3fd636a10a532948\jsr305-3.0.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="5871fb60dc68d67da54a663c3fd636a10a532948">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\jsr305-3.0.0_e0855c2749c2a5bb259264418178d7956cc89167.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.android.support\appcompat-v7\23.4.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="548f06de403a9409f00554b3ee12a9fdea0e236c">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.android.support-appcompat-v7-23.4.0_84c475ceef3f03415fe9043192261ec86c927202.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Huang_Q\.gradle\caches\modules-2\files-2.1\com.parse.bolts\bolts-tasks\1.4.0\d85884acf6810a3bbbecb587f239005cbc846dc4\bolts-tasks-1.4.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="d85884acf6810a3bbbecb587f239005cbc846dc4">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\bolts-tasks-1.4.0_362fd0f2dded9b1953dcccc9fff2a6904469d77c.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.facebook.fresco\imagepipeline\1.3.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="48c7f54c2515a2312d3a4481d10c43fbb807f3af">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.facebook.fresco-imagepipeline-1.3.0_472d0dd5b064b1ee9625e38e58bee8fd90028704.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.android.support\support-vector-drawable\23.4.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="c2c594cace5d83a3227b2b6e658ecbfd586d3ed9">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.android.support-support-vector-drawable-23.4.0_29de1712a12659a24a360f11e4171c6faf5f3ad1.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.android.support\animated-vector-drawable\23.4.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="de4db3785756bfb0915a9f59a9b3f2fea7407be4">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.android.support-animated-vector-drawable-23.4.0_52bb2c53b274f49432608aed5b8b9947b244b7f6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.facebook.fresco\fbcore\1.3.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="37345de2ed2772f385eaeec37a9c2ff0fea99ad7">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.facebook.fresco-fbcore-1.3.0_c602b8cad2741fe314cf47d5a9d66f2b231de2a6.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.4.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="67bd36ee9340ec7c254108936ad16b24bed160cc">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.android.support-support-v4-23.4.0_7d1c28960f10a2c05bf339ca33aea829295dd824.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.facebook.react\react-native\0.50.3\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="24303e5ddb2c1210dd7e8db9dbab018f50313e48">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.facebook.react-react-native-0.50.3_d8c17d76e2a885e7e1685af2fb6e83f603deed72.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.facebook.fresco\imagepipeline-base\1.3.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="72128af126ddd7d6252da9357fe560d3abcdfb0c">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.facebook.fresco-imagepipeline-base-1.3.0_4549317eeb8ade0371197ef7af7f3b0cf086937d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Huang_Q\.gradle\caches\modules-2\files-2.1\com.facebook.fbui.textlayoutbuilder\staticlayout-proxy\1.0\f162442a19fff13995fbd51ba414d9ee05579080\staticlayout-proxy-1.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="f162442a19fff13995fbd51ba414d9ee05579080">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\staticlayout-proxy-1.0_c38e30b513237fd1441229b8be34e423404f6c2d.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Huang_Q\.gradle\caches\modules-2\files-2.1\com.squareup.okhttp3\okhttp\3.6.0\69edde9fc4b01c9fd51d25b83428837478c27254\okhttp-3.6.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="69edde9fc4b01c9fd51d25b83428837478c27254">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\okhttp-3.6.0_8c3c25ca4952fa3debdda2207311700691b825c5.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\Android\sdk\extras\android\m2repository\com\android\support\support-annotations\23.4.0\support-annotations-23.4.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="ffbe55fdb2bb456b1485831706a9eac3300bb6b8">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\support-annotations-23.4.0_6c2a284fdd61d0d8ac24aa3991d9cfbc35ef85c7.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.android.support\support-v4\23.4.0\jars\libs\internal_impl-23.4.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="ea3c07504d2c8f4b13aa17c45c1b68ed9c1c3674">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\internal_impl-23.4.0_3cecdbb4c7b8b9be78f15cdd61dbe7cf9faf5d79.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.facebook.fresco\drawee\1.3.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="c65a2e39d54023bac3aef64a2f0cff89289c7ff6">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.facebook.fresco-drawee-1.3.0_3dfd901fb698236d99129166a945bbe5ac9fb3d9.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\exploded-aar\com.facebook.fresco\imagepipeline-okhttp3\1.3.0\jars\classes.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="c03c08c9934b23c8c09c803345ec51a74119127b">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\com.facebook.fresco-imagepipeline-okhttp3-1.3.0_c059c3eb4e9986d0e49ea774a1da9c4e8183a760.jar" />
+    </item>
+    <item
+        is-multidex="false"
+        jar="C:\Users\Huang_Q\.gradle\caches\modules-2\files-2.1\com.squareup.okio\okio\1.13.0\a9283170b7305c8d92d25aff02a6ab7e45d06cbe\okio-1.13.0.jar"
+        jumboMode="false"
+        optimize="true"
+        revision="23.0.1"
+        sha1="a9283170b7305c8d92d25aff02a6ab7e45d06cbe">
+        <dex dex="D:\mobile-cloud\new\cloud-main-module\android\app\build\intermediates\pre-dexed\debug\okio-1.13.0_937bbbfe8524d7315983699dcd40d75962940e1a.jar" />
+    </item>
+
+</items>

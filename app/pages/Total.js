@@ -1,5 +1,5 @@
-import React, { Component} from 'react';
-import { View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView,DeviceEventEmitter,NativeModules } from 'react-native';
+import React, { Component } from 'react';
+import { View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, DeviceEventEmitter, NativeModules } from 'react-native';
 import List from '../components/List';
 import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -8,7 +8,7 @@ const PRE_PRO = ['请回答2017', '摄影大赛', '柴火开发', '柳交所'];
 export default class Total extends Component {
 
     static navigationOptions = ({ navigation }) => ({
-        title: `${navigation.state.params.org}下的所有项目`,
+        title: `${navigation.state.params.currentOrganization.name}下的所有项目`,
         headerRight: (
             <Icon.Button
                 name="md-search"
@@ -32,24 +32,35 @@ export default class Total extends Component {
     }
     //获取projects数据
     getProjects() {
-        this.setState({
-            dataSource: this.state.dataSource.cloneWithRows(PRE_PRO)
+        console.log(this.props.navigation.state.params.currentOrganization)
+        var url = "http://gateway.devops.saas.hand-china.com/uaa/v1/organization/" + this.props.navigation.state.params.currentOrganization.id + "/projects/self";
+        fetch(url, {
+            headers: {
+                "Authorization": "Bearer bb761f3c-4f17-4a1a-92da-0c8818bd6c2e"
+            }
         })
+            .then((response) => response.json())
+            .then((responseData) => {
+                this.setState({
+                    dataSource: this.state.dataSource.cloneWithRows(responseData)
+                })
+                console.log(responseData)
+            });
     }
-    
+
     chooseProject(project) {
         DeviceEventEmitter.emit('chooseProject', project);
         this.props.navigation.dispatch({
-            key:'FirstPage',
-            type:'BcakToCurrentScreen',
-            routeName:'FirstPage',
+            key: 'FirstPage',
+            type: 'BcakToCurrentScreen',
+            routeName: 'FirstPage',
         });
     }
 
     renderProject(project) {
         return (
             <List
-                text={project}
+                text={project.name}
                 onPress={() => this.chooseProject(project)}
             />
         );

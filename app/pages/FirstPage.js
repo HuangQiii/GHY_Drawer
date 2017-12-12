@@ -1,18 +1,19 @@
 import React, { Component, } from 'react';
-import { View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight } from 'react-native';
+import { View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight,DeviceEventEmitter } from 'react-native';
 import { NativeModules } from 'react-native';
 import List from '../components/List';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from 'react-native-splash-screen'
 
 const PRE_ORG = ['开发部', '设计部', '软件园', '学苑', '新闻网', '生活网', '音乐网', '办公室', '运营部', '自媒体中心'];
-const LATEST_OPEN = [];
+const LATEST_OPEN = ['柴火开发','柳交所','摄影大赛'];
 const LIST_ARRAY = [
     { name: '首页查询', icon: 'md-home' },
     { name: '进度跟进', icon: 'md-eye' },
     { name: '任务分配', icon: 'md-briefcase' },
     { name: '交流中心', icon: 'md-contact' },
     { name: '事后总结', icon: 'md-settings' }];
+const ARRAY_TEMP=[];
 const { width, height } = Dimensions.get('window');
 export default class FirstPage extends Component {
 
@@ -24,9 +25,9 @@ export default class FirstPage extends Component {
             userName: '',
             userEmail: '',
             organizationShow: false,
-            organization: '',
+            currentOrganization: '',
             dataOrgSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
-            project: '',
+            currentProject: '',
             dataLatestOpenSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
             list: '',
             dataListSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
@@ -35,80 +36,141 @@ export default class FirstPage extends Component {
 
     componentDidMount() {
         SplashScreen.hide();
-        this.getConfig();
+        DeviceEventEmitter.addListener('chooseProject', (project) => {
+            this.selectProject(project);
+        });
         this.getMessage();
     }
 
+    componentWillUnmount() {
+        DeviceEventEmitter.removeAllListeners('chooseProject');
+    }
+
     getMessage() {
+        this.getUserMessage();
+        this.getBundles();
+        this.getLatestProjects();
+        this.getCurrent();
+    }
+
+    getUserMessage(){
         this.setState({
             userHeadImage: 'https://pic4.zhimg.com/v2-292a49c4ca7046333ec6e529c6485dbf_xl.jpg',
             userName: '小勾兑',
             userEmail: 'qihuang@ghy.cn',
-            organization: '开发部',
-            dataListSource: this.state.dataLatestOpenSource.cloneWithRows(LIST_ARRAY)
         })
     }
 
-    getConfig() {
-        console.log("读配置文件里的当前组织this.state.organization，当前项目this.state.project和最近项目this.state.dataLatestOpenSource渲染到页面上")
-        //=====================================================================================================================
-        // NativeModules.NativeManager.getConfigData((back) => {
-        //     console.log("---back:---");
-        //     console.log(back);
-        //     var temp = [];
-
-        //     if (back.latestPros.first != '') {
-        //         temp.push(back.latestPros.first)
-        //     }
-        //     if (back.latestPros.second != '') {
-        //         temp.push(back.latestPros.second)
-        //     }
-        //     if (back.latestPros.third != '') {
-        //         temp.push(back.latestPros.third)
-        //     }
-        //     this.setState({
-        //         organization: back.orgId,
-        //         project: back.proId,
-        //         dataLatestOpenSource: this.state.dataLatestOpenSource.cloneWithRows(temp)
-        //     });
-        // });
-        //=====================================================================================================================
-    }
-
-    getOrg() {
+    getOrganizations() {
         this.setState({
             dataOrgSource: this.state.dataOrgSource.cloneWithRows(PRE_ORG),
         });
     }
 
-    selectOrg(list) {
-        this.setState({ organization: list, organizationShow: !this.state.organizationShow })
-        console.log("把当前组织写入配置文件")
-        //=====================================================================================================================
-        //NativeModules.NativeManager.writeUserConfig([list, this.state.project]);
-        //=====================================================================================================================
+    getBundles(){
+        this.setState({
+            dataListSource: this.state.dataOrgSource.cloneWithRows(LIST_ARRAY),
+        });
     }
 
-    renderOrg(list) {
-        var bgColor = list == this.state.organization ? '#F3F3F3' : '#FEFEFE';
+    getLatestProjects(){
+        this.setState({
+            dataLatestOpenSource: this.state.dataOrgSource.cloneWithRows(LATEST_OPEN),
+        });
+        ARRAY_TEMP = LATEST_OPEN.concat();
+    }
+
+    getCurrent(){
+        this.setState({
+            currentOrganization:'开发部',
+            currentProject:''
+        });
+    }
+
+    selectOrganization(organization) {
+        this.setState({ 
+            currentOrganization: organization, 
+            organizationShow: !this.state.organizationShow 
+        })
+        if(this.state.list != ""){
+            this.setState({
+                currentProject:''
+            });
+            console.log("触发事件打开"+organization+"项目下的"+this.state.list+"【组织层】数据")
+        }
+    }
+
+    renderOrg(organization) {
+        var bgColor = organization == this.state.currentOrganization ? '#F3F3F3' : '#FEFEFE';
         return (
             <List
-                text={list}
+                text={organization}
                 bgColor={bgColor}
-                onPress={() => this.selectOrg(list)}
+                onPress={() => this.selectOrganization(organization)}
             />
         );
     }
 
-    renderList(list) {
-        var bgColor;
-        if (this.state.list != '') {
-            bgColor = list.name == this.state.list ? '#F3F3F3' : '#FEFEFE';
-        } else if (this.props.navigation.state.params && this.props.navigation.state.params.list != '') {
-            bgColor = list.name == this.props.navigation.state.params.list ? '#F3F3F3' : '#FEFEFE';
-        } else {
-            bgColor = list.name == "首页" ? '#F3F3F3' : '#FEFEFE';
+    selectProject(project){
+        const pos = ARRAY_TEMP.indexOf(project);
+        if (pos === -1) {
+            ARRAY_TEMP.unshift(project);
+            ARRAY_TEMP = ARRAY_TEMP.splice(0,4);
+            this.setState({
+                currentProject:project,
+                dataLatestOpenSource: this.state.dataLatestOpenSource.cloneWithRows(ARRAY_TEMP),
+                
+            });
+        } else if(pos === 0){
+            this.setState({
+                currentProject:project,
+            });
+        }else{
+            ARRAY_TEMP.splice(pos, 1);
+            ARRAY_TEMP.unshift(project);
+            ARRAY_TEMP = ARRAY_TEMP.splice(0,4);
+            this.setState({
+                currentProject:project,
+                dataLatestOpenSource: this.state.dataLatestOpenSource.cloneWithRows(ARRAY_TEMP),
+                
+            });
         }
+        
+        if(this.state.list != ''){
+            console.log("触发事件打开"+this.state.currentOrganization+"项目下的"+project+"项目下的"+this.state.list+"【项目层】数据")
+        }
+    }
+
+    selectList(list){
+        this.setState({
+            list: list.name
+        });
+        if(this.state.currentOrganization != '' && this.state.currentProject != ''){
+            console.log("触发事件打开"+this.state.currentOrganization+"项目下的"+this.state.currentProject+"项目下的"+list.name+"【项目层】数据")
+        }else if(this.state.currentOrganization != '' && this.state.currentProject === ''){
+            console.log("触发事件打开"+this.state.currentOrganization+"项目下的"+list.name+"【组织层】数据")
+        }
+    }
+
+    renderListLatestOpen(project) {
+        var bgColor = project == this.state.currentProject ? '#F3F3F3' : '#FEFEFE';
+        return (
+            <List
+                text={project}
+                bgColor={bgColor}
+                onPress={() => {
+                    this.setState({
+                        currentProject: project
+                    });
+                    this.selectProject(project);
+                    this.openFromMenu(this.state.currentProject, this.state.currentOrganization, project, false);
+                }}
+            />
+        )
+    }
+
+    renderList(list) {
+        var bgColor = list.name == this.state.list ? '#F3F3F3' : '#FEFEFE';
 
         return (
             <List
@@ -117,33 +179,13 @@ export default class FirstPage extends Component {
                 listHeight={46}
                 bgColor={bgColor}
                 onPress={() => {
-                    this.openFromMenu(list.name, this.state.organization, this.state.project, true);
-                    this.setState({
-                        list: list.name
-                    })
+                    this.selectList(list)
                 }}
             />
         );
     }
 
-    renderListLatestOpen(list) {
-        var bgColor = list == this.state.project ? '#F3F3F3' : '#FEFEFE';
-        return (
-            <List
-                text={list}
-                bgColor={bgColor}
-                onPress={() => {
-                    //=====================================================================================================================
-                    //NativeModules.NativeManager.writeUserConfig([this.state.organization, list]);
-                    //=====================================================================================================================
-                    this.setState({
-                        project: list
-                    });
-                    this.openFromMenu(this.state.list, this.state.organization, list, false);
-                }}
-            />
-        )
-    }
+    
 
     openFromMenu(listName, orgId, proId, isClose) {
         //var orgId = this.state.organization;
@@ -193,7 +235,7 @@ export default class FirstPage extends Component {
                     </View>
                     <TouchableOpacity
                         onPress={() => {
-                            if (!this.state.organizationShow) { this.getOrg(); }
+                            if (!this.state.organizationShow) { this.getOrganizations(); }
                             this.setState({
                                 organizationShow: !this.state.organizationShow
                             });
@@ -201,7 +243,7 @@ export default class FirstPage extends Component {
                     >
                         <View style={styles.topAreaOrganizationInformation}>
                             <View style={[styles.verticalCenter, { flex: 1, }]}>
-                                <Text style={[styles.fontColorFFF, { fontSize: 14, marginLeft: 16 }]}>{this.state.organization}</Text>
+                                <Text style={[styles.fontColorFFF, { fontSize: 14, marginLeft: 16 }]}>{this.state.currentOrganization}</Text>
                             </View>
                             <View style={[styles.verticalCenter, { width: 28, }]}>
                                 <Icon name="md-arrow-dropdown" size={30} color={'#FFF'} />
@@ -211,7 +253,7 @@ export default class FirstPage extends Component {
                 </View>
                 {
                     this.state.organizationShow &&
-                    <View>
+                    <View style={{height:height}}>
                         <ListView
                             dataSource={this.state.dataOrgSource}
                             renderRow={this.renderOrg.bind(this)}
@@ -219,12 +261,13 @@ export default class FirstPage extends Component {
                     </View>
                 }
                 {
-                    !this.state.organizationShow &&
                     <View>
                         <List
                             text={'最近打开的项目'}
                             overlayMarginTop={4}
                             textColor={'rgba(0,0,0,0.54)'}
+                            underlayColor={'transparent'}
+                            activeOpacity={1}
                         />
                         <ListView
                             dataSource={this.state.dataLatestOpenSource}
@@ -236,7 +279,7 @@ export default class FirstPage extends Component {
                             listHeight={62}
                             leftIconName={'md-menu'}
                             rightIconName={'ios-arrow-forward'}
-                            onPress={() => this.props.navigation.navigate('Total', { org: this.state.organization, list: this.state.list })}
+                            onPress={() => this.props.navigation.navigate('Total', { org: this.state.currentOrganization })}
                         />
                         <View style={styles.listBottomBorder}></View>
                         <ListView

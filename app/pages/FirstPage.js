@@ -1,18 +1,12 @@
 import React, { Component, } from 'react';
-import { AppState, View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight, DeviceEventEmitter } from 'react-native';
-import { NativeModules } from 'react-native';
+import { AppState, View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight, DeviceEventEmitter, Alert } from 'react-native';
+import { NativeModules, NetInfo } from 'react-native';
 import List from '../components/List';
 import Icon from 'react-native-vector-icons/Ionicons';
-import SplashScreen from 'react-native-splash-screen'
 
 const PRE_ORG = [];
 const LATEST_OPEN = [];
-const LIST_ARRAY = [
-    { id: 1, name: '首页查询', nameCn: '首页', icon: 'md-home' },
-    { id: 2, name: '进度跟进', nameCn: '智能洞察', icon: 'md-eye' },
-    { id: 3, name: '任务分配', nameCn: '小舟', icon: 'md-briefcase' },
-    { id: 4, name: '交流中心', nameCn: '从此逝', icon: 'md-contact' },
-    { id: 5, name: '事后总结', nameCn: '江海寄馀生', icon: 'md-settings' }];
+const LIST_ARRAY = [];
 const ARRAY_TEMP = [];
 const { width, height } = Dimensions.get('window');
 export default class FirstPage extends Component {
@@ -35,14 +29,11 @@ export default class FirstPage extends Component {
     }
 
     componentWillMount() {
-        AppState.addEventListener('change', this.handleAppStateChange);
+        AppState.addEventListener('change', (appState) => { this.handleAppStateChange(appState) });
     }
 
     componentDidMount() {
-        SplashScreen.hide();
-        DeviceEventEmitter.addListener('chooseProject', (project) => {
-            this.selectProject(project);
-        });
+        DeviceEventEmitter.addListener('chooseProject', (project) => { this.selectProject(project); });
         this.getMessage();
     }
 
@@ -53,15 +44,16 @@ export default class FirstPage extends Component {
 
     handleAppStateChange(appState) {
         if (appState != 'active') {
-            //调用NativeModules写入最近打开数组
+            this.writeUserConfig();
         }
     }
 
     getMessage() {
         this.getUserMessage();
         this.getBundles();
-        this.getLatestProjects();
-        this.getCurrent();
+        // this.getLatestProjects();
+        //this.getCurrent();
+        this.getUserConfig();
     }
 
     getUserMessage() {
@@ -108,12 +100,28 @@ export default class FirstPage extends Component {
             });
     }
 
-    getLatestProjects() {
-        //调用NativeModules读取最近打开数组
-        this.setState({
-            latestProjectsSource: this.state.latestProjectsSource.cloneWithRows(LATEST_OPEN),
-        });
-        ARRAY_TEMP = LATEST_OPEN.concat();
+    getUserConfig() {
+        NativeModules.NativeManager.getUserConfig((back) => {
+            console.log(back)
+            var org = {};
+            var project = {};
+            var latest = [];
+            if (back.currentOrganization != undefined) {
+                org = back.currentOrganization
+            }
+            if (back.currentProject != undefined) {
+                project = back.currentProject
+            }
+            if (back.latestProjects != undefined) {
+                latest = back.latestProjects
+            }
+            this.setState({
+                currentOrganization: org,
+                currentProject: project,
+                latestProjectsSource: this.state.latestProjectsSource.cloneWithRows(latest)
+            });
+            ARRAY_TEMP = latest.concat();
+        })
     }
 
     getBundles() {
@@ -131,14 +139,6 @@ export default class FirstPage extends Component {
             });
     }
 
-    getCurrent() {
-        //调用NativeModules读取当前org和pro
-        this.setState({
-            currentOrganization: {},
-            currentProject: {}
-        });
-    }
-
     selectOrganization(organization) {
         this.setState({
             currentOrganization: organization,
@@ -148,15 +148,12 @@ export default class FirstPage extends Component {
             this.setState({
                 currentProject: {}
             });
-            this.openBundle(this.state.currentOrganization.id, '', this.state.currentBundle.id, true)
+            this.openBundle(this.state.currentOrganization.id, '', this.state.currentBundle.name, true)
         }
+        this.writeUserConfig();
     }
 
-
-
     selectProject(project) {
-
-
         //const pos = ARRAY_TEMP.indexOf(project);
         const pos = ARRAY_TEMP.findIndex(x => x.id == project.id)
         if (pos === -1) {
@@ -183,19 +180,91 @@ export default class FirstPage extends Component {
         }
 
         if (this.state.currentBundle.id != undefined) {
-            this.openBundle(project.organizationId, project.id, this.state.currentBundle.id, true)
+            this.openBundle(project.organizationId, project.id, this.state.currentBundle.name, true)
         }
+        this.writeUserConfig();
     }
 
     selectBundle(bundle) {
         this.setState({
             currentBundle: bundle
         });
-        if (this.state.currentOrganization.id != undefined && this.state.currentProject.id != undefined) {
-            this.openBundle(this.state.currentOrganization.id, this.state.currentProject.id, bundle.id, true)
-        } else if (this.state.currentOrganization.id != undefined && this.state.currentProject.id === undefined) {
-            this.openBundle(this.state.currentOrganization.id, '', bundle.id, true)
+        var orgId = -1;
+        var proId = -1;
+        if (this.state.currentOrganization.id != undefined) {
+            orgId = this.state.currentOrganization.id
         }
+        if (this.state.currentProject.id != undefined) {
+            proId = this.state.currentProject.id
+        }
+        //判断是否下载
+        NativeModules.NativeManager.openBundle(bundle.name, orgId, proId, (type, result) => {
+            let title = ""
+            if (type == "update") {
+                title = "发现新版本,是否升级?" + result;
+            } else {
+                title = "未安装应用，是否安装？"
+            }
+            Alert.alert(
+                title,
+                title,
+                [
+                    {
+                        text: '是',
+                        onPress: () => {
+                            NetInfo.fetch().done((connectionInfo) => {
+                                //var connectionType = connectionInfo.type;
+                                // if (connectionType == 'wifi') {
+                                if (connectionInfo == 'WIFI') {
+                                    NativeModules.NativeManager.downloadAndOpenBundle(bundle.name, bundle.id, bundle.currentVersion, bundle.downloadUrl, (type, result) => {
+                                        if (type == "netError") {
+                                            Alert.alert("网络或服务器出错，请重启软件再尝试！");
+                                        } else if (type == "success") {
+
+                                        } else {
+                                            Alert.alert(result);
+                                        }
+                                    });
+                                } else {
+                                    Alert.alert(
+                                        "提示",
+                                        "当前正在使用非wifi连接下载，确定要下载吗？",
+                                        [
+                                            {
+                                                text: '是',
+                                                onPress: () => {
+                                                    NativeModules.NativeManager.downloadAndOpenBundle(bundle.name, bundle.id, bundle.currentVersion, bundle.downloadUrl, (type, result) => {
+                                                        if (type == "netError") {
+                                                            Alert.alert("网络或服务器出错，请重启软件再尝试！");
+                                                        } else if (type == "success") {
+
+                                                        } else {
+                                                            Alert.alert(result);
+                                                        }
+                                                    });
+                                                }
+                                            },
+                                            {
+                                                text: '否'
+                                            }
+                                        ]
+                                    )
+                                }
+                            });
+                        }
+                    },
+                    {
+                        text: '否'
+                    }
+                ]
+            );
+            // }
+        });
+        // if (this.state.currentOrganization.id != undefined && this.state.currentProject.id != undefined) {
+        //     this.openBundle(this.state.currentOrganization.id, this.state.currentProject.id, bundle.id, true)
+        // } else if (this.state.currentOrganization.id != undefined && this.state.currentProject.id === undefined) {
+        //     this.openBundle(this.state.currentOrganization.id, '', bundle.id, true)
+        // }
     }
 
     renderOrganization(organization) {
@@ -225,7 +294,7 @@ export default class FirstPage extends Component {
 
         return (
             <List
-                text={bundle.nameCn}
+                text={bundle.name}
                 leftIconName={bundle.icon}
                 listHeight={46}
                 bgColor={bgColor}
@@ -234,20 +303,35 @@ export default class FirstPage extends Component {
         );
     }
 
+    writeUserConfig() {
+        var obj = {};
+        obj.currentOrganization = this.state.currentOrganization;
+        obj.currentProject = this.state.currentProject;
+        obj.latestProjects = ARRAY_TEMP.concat();
+        NativeModules.NativeManager.writeUserConfig(obj)
+    }
 
-
-    openBundle(organizationId, projectId, bundleId, isClose) {
-        //打开子模块
-        //=====================================================================================================================
-        //NativeModules.NativeManager.openFromMenuNew(organizationId, projectId, bundleId, isClose);
-        //=====================================================================================================================
-
-        //}
+    openBundle(organizationId, projectId, name, isClose) {
         console.log(
             "organization:" + organizationId +
             "projectId:" + projectId +
-            "bundleId:" + bundleId
+            "name:" + name
         )
+        var orgId = -1;
+        var proId = -1;
+        if (organizationId != undefined && organizationId != '') {
+            orgId = organizationId
+        }
+        if (projectId != undefined && projectId != '') {
+            proId = projectId
+        }
+        NativeModules.NativeManager.openBundle(name, orgId, proId, (type, result) => {
+
+        });
+    }
+
+    openLogin() {
+        NativeModules.NativeManager.openLogin();
     }
 
     render() {
@@ -276,9 +360,11 @@ export default class FirstPage extends Component {
                                 {this.state.userEmail}
                             </Text>
                         </View>
-                        <View style={styles.topAreaBasicInformationSetting}>
-                            <Icon name="md-settings" size={20} color={'#FFF'} />
-                        </View>
+                        <TouchableOpacity onPress={() => this.openLogin()}>
+                            <View style={styles.topAreaBasicInformationSetting}>
+                                <Icon name="md-settings" size={20} color={'#FFF'} />
+                            </View>
+                        </TouchableOpacity>
                     </View>
                     <TouchableOpacity
                         onPress={() => {
@@ -349,7 +435,7 @@ var styles = StyleSheet.create({
     },
     topArea: {
         height: 137,
-        backgroundColor: '#Fab614'
+        backgroundColor: '#3F51B5'
     },
     topAreaBasicInformation: {
         flex: 1,

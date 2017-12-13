@@ -1,19 +1,19 @@
 import React, { Component, } from 'react';
-import { View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight,DeviceEventEmitter } from 'react-native';
+import { View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight, DeviceEventEmitter } from 'react-native';
 import { NativeModules } from 'react-native';
 import List from '../components/List';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from 'react-native-splash-screen'
 
 const PRE_ORG = ['开发部', '设计部', '软件园', '学苑', '新闻网', '生活网', '音乐网', '办公室', '运营部', '自媒体中心'];
-const LATEST_OPEN = ['柴火开发','柳交所','摄影大赛'];
+const LATEST_OPEN = ['柴火开发', '柳交所', '摄影大赛'];
 const LIST_ARRAY = [
     { name: '首页查询', icon: 'md-home' },
     { name: '进度跟进', icon: 'md-eye' },
     { name: '任务分配', icon: 'md-briefcase' },
     { name: '交流中心', icon: 'md-contact' },
     { name: '事后总结', icon: 'md-settings' }];
-const ARRAY_TEMP=[];
+const ARRAY_TEMP = [];
 const { width, height } = Dimensions.get('window');
 export default class FirstPage extends Component {
 
@@ -33,7 +33,9 @@ export default class FirstPage extends Component {
             dataListSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
         };
     }
-
+    componentWillMount() {
+        AppState.addEventListener('change', (appState) => { this.handleAppStateChange(appState) });
+    }
     componentDidMount() {
         SplashScreen.hide();
         DeviceEventEmitter.addListener('chooseProject', (project) => {
@@ -44,8 +46,14 @@ export default class FirstPage extends Component {
 
     componentWillUnmount() {
         DeviceEventEmitter.removeAllListeners('chooseProject');
+        AppState.removeEventListener('change', this.handleAppStateChange);
     }
 
+    handleAppStateChange(appState) {
+        if (appState != 'active') {
+            console.log('close')
+        }
+    }
     getMessage() {
         this.getUserMessage();
         this.getBundles();
@@ -53,7 +61,7 @@ export default class FirstPage extends Component {
         this.getCurrent();
     }
 
-    getUserMessage(){
+    getUserMessage() {
         this.setState({
             userHeadImage: 'https://pic4.zhimg.com/v2-292a49c4ca7046333ec6e529c6485dbf_xl.jpg',
             userName: '小勾兑',
@@ -67,36 +75,36 @@ export default class FirstPage extends Component {
         });
     }
 
-    getBundles(){
+    getBundles() {
         this.setState({
             dataListSource: this.state.dataOrgSource.cloneWithRows(LIST_ARRAY),
         });
     }
 
-    getLatestProjects(){
+    getLatestProjects() {
         this.setState({
             dataLatestOpenSource: this.state.dataOrgSource.cloneWithRows(LATEST_OPEN),
         });
         ARRAY_TEMP = LATEST_OPEN.concat();
     }
 
-    getCurrent(){
+    getCurrent() {
         this.setState({
-            currentOrganization:'开发部',
-            currentProject:''
+            currentOrganization: '开发部',
+            currentProject: ''
         });
     }
 
     selectOrganization(organization) {
-        this.setState({ 
-            currentOrganization: organization, 
-            organizationShow: !this.state.organizationShow 
+        this.setState({
+            currentOrganization: organization,
+            organizationShow: !this.state.organizationShow
         })
-        if(this.state.list != ""){
+        if (this.state.list != "") {
             this.setState({
-                currentProject:''
+                currentProject: ''
             });
-            console.log("触发事件打开"+organization+"项目下的"+this.state.list+"【组织层】数据")
+            console.log("触发事件打开" + organization + "项目下的" + this.state.list + "【组织层】数据")
         }
     }
 
@@ -111,44 +119,44 @@ export default class FirstPage extends Component {
         );
     }
 
-    selectProject(project){
+    selectProject(project) {
         const pos = ARRAY_TEMP.indexOf(project);
         if (pos === -1) {
             ARRAY_TEMP.unshift(project);
-            ARRAY_TEMP = ARRAY_TEMP.splice(0,4);
+            ARRAY_TEMP = ARRAY_TEMP.splice(0, 4);
             this.setState({
-                currentProject:project,
+                currentProject: project,
                 dataLatestOpenSource: this.state.dataLatestOpenSource.cloneWithRows(ARRAY_TEMP),
-                
+
             });
-        } else if(pos === 0){
+        } else if (pos === 0) {
             this.setState({
-                currentProject:project,
+                currentProject: project,
             });
-        }else{
+        } else {
             ARRAY_TEMP.splice(pos, 1);
             ARRAY_TEMP.unshift(project);
-            ARRAY_TEMP = ARRAY_TEMP.splice(0,4);
+            ARRAY_TEMP = ARRAY_TEMP.splice(0, 4);
             this.setState({
-                currentProject:project,
+                currentProject: project,
                 dataLatestOpenSource: this.state.dataLatestOpenSource.cloneWithRows(ARRAY_TEMP),
-                
+
             });
         }
-        
-        if(this.state.list != ''){
-            console.log("触发事件打开"+this.state.currentOrganization+"项目下的"+project+"项目下的"+this.state.list+"【项目层】数据")
+
+        if (this.state.list != '') {
+            console.log("触发事件打开" + this.state.currentOrganization + "项目下的" + project + "项目下的" + this.state.list + "【项目层】数据")
         }
     }
 
-    selectList(list){
+    selectList(list) {
         this.setState({
             list: list.name
         });
-        if(this.state.currentOrganization != '' && this.state.currentProject != ''){
-            console.log("触发事件打开"+this.state.currentOrganization+"项目下的"+this.state.currentProject+"项目下的"+list.name+"【项目层】数据")
-        }else if(this.state.currentOrganization != '' && this.state.currentProject === ''){
-            console.log("触发事件打开"+this.state.currentOrganization+"项目下的"+list.name+"【组织层】数据")
+        if (this.state.currentOrganization != '' && this.state.currentProject != '') {
+            console.log("触发事件打开" + this.state.currentOrganization + "项目下的" + this.state.currentProject + "项目下的" + list.name + "【项目层】数据")
+        } else if (this.state.currentOrganization != '' && this.state.currentProject === '') {
+            console.log("触发事件打开" + this.state.currentOrganization + "项目下的" + list.name + "【组织层】数据")
         }
     }
 
@@ -185,7 +193,7 @@ export default class FirstPage extends Component {
         );
     }
 
-    
+
 
     openFromMenu(listName, orgId, proId, isClose) {
         //var orgId = this.state.organization;
@@ -253,7 +261,7 @@ export default class FirstPage extends Component {
                 </View>
                 {
                     this.state.organizationShow &&
-                    <View style={{height:height}}>
+                    <View style={{ height: height }}>
                         <ListView
                             dataSource={this.state.dataOrgSource}
                             renderRow={this.renderOrg.bind(this)}

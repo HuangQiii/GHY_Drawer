@@ -32,11 +32,10 @@ export default class Total extends Component {
     }
     //获取projects数据
     getProjects() {
-        console.log(this.props.navigation.state.params.currentOrganization)
-        var url = "http://gateway.devops.saas.hand-china.com/uaa/v1/organization/" + this.props.navigation.state.params.currentOrganization.id + "/projects/self";
+        var url = "http://gateway.deploy.saas.hand-china.com/uaa/v1/organization/" + this.props.navigation.state.params.currentOrganization.id + "/projects/self";
         fetch(url, {
             headers: {
-                "Authorization": "Bearer bb761f3c-4f17-4a1a-92da-0c8818bd6c2e"
+                "Authorization": "Bearer eb51aa17-0148-43d5-87d3-e17254494543"
             }
         })
             .then((response) => response.json())
@@ -44,7 +43,6 @@ export default class Total extends Component {
                 this.setState({
                     dataSource: this.state.dataSource.cloneWithRows(responseData)
                 })
-                console.log(responseData)
             });
     }
 

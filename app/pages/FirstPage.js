@@ -8,11 +8,11 @@ import SplashScreen from 'react-native-splash-screen'
 const PRE_ORG = [];
 const LATEST_OPEN = [];
 const LIST_ARRAY = [
-    { name: '首页查询', icon: 'md-home' },
-    { name: '进度跟进', icon: 'md-eye' },
-    { name: '任务分配', icon: 'md-briefcase' },
-    { name: '交流中心', icon: 'md-contact' },
-    { name: '事后总结', icon: 'md-settings' }];
+    { id: 1, name: '首页查询', nameCn: '首页', icon: 'md-home' },
+    { id: 2, name: '进度跟进', nameCn: '智能洞察', icon: 'md-eye' },
+    { id: 3, name: '任务分配', nameCn: '小舟', icon: 'md-briefcase' },
+    { id: 4, name: '交流中心', nameCn: '从此逝', icon: 'md-contact' },
+    { id: 5, name: '事后总结', nameCn: '江海寄馀生', icon: 'md-settings' }];
 const ARRAY_TEMP = [];
 const { width, height } = Dimensions.get('window');
 export default class FirstPage extends Component {
@@ -25,12 +25,12 @@ export default class FirstPage extends Component {
             userName: '',
             userEmail: '',
             organizationShow: false,
-            currentOrganization: '',
-            dataOrgSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
-            currentProject: '',
-            dataLatestOpenSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
-            list: '',
-            dataListSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
+            currentOrganization: {},
+            organizationsSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
+            currentProject: {},
+            latestProjectsSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
+            currentBundle: {},
+            bundlesSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
         };
     }
 
@@ -53,7 +53,7 @@ export default class FirstPage extends Component {
 
     handleAppStateChange(appState) {
         if (appState != 'active') {
-            console.log('写入最近打开项目')
+            //调用NativeModules写入最近打开数组
         }
     }
 
@@ -65,9 +65,9 @@ export default class FirstPage extends Component {
     }
 
     getUserMessage() {
-        fetch("http://gateway.devops.saas.hand-china.com/uaa/v1/users/querySelf", {
+        fetch("http://gateway.deploy.saas.hand-china.com/uaa/v1/users/querySelf", {
             headers: {
-                "Authorization": "Bearer bb761f3c-4f17-4a1a-92da-0c8818bd6c2e"
+                "Authorization": "Bearer eb51aa17-0148-43d5-87d3-e17254494543"
             }
         })
             .then((response) => response.json())
@@ -78,10 +78,10 @@ export default class FirstPage extends Component {
                     userEmail: responseData.email,
                 })
 
-                var url = "http://gateway.devops.saas.hand-china.com/uaa/v1/organizations/" + responseData.organizationId
+                var url = "http://gateway.deploy.saas.hand-china.com/uaa/v1/organizations/" + responseData.organizationId
                 fetch(url, {
                     headers: {
-                        "Authorization": "Bearer bb761f3c-4f17-4a1a-92da-0c8818bd6c2e"
+                        "Authorization": "Bearer eb51aa17-0148-43d5-87d3-e17254494543"
                     }
                 })
                     .then((res) => res.json())
@@ -95,36 +95,47 @@ export default class FirstPage extends Component {
     }
 
     getOrganizations() {
-        fetch("http://gateway.devops.saas.hand-china.com/uaa/v1/menus/select", {
+        fetch("http://gateway.deploy.saas.hand-china.com/uaa/v1/menus/select", {
             headers: {
-                "Authorization": "Bearer bb761f3c-4f17-4a1a-92da-0c8818bd6c2e"
+                "Authorization": "Bearer eb51aa17-0148-43d5-87d3-e17254494543"
             }
         })
             .then((response) => response.json())
             .then((responseData) => {
                 this.setState({
-                    dataOrgSource: this.state.dataOrgSource.cloneWithRows(responseData.organizations)
+                    organizationsSource: this.state.organizationsSource.cloneWithRows(responseData.organizations)
                 })
             });
     }
 
-    getBundles() {
-        this.setState({
-            dataListSource: this.state.dataOrgSource.cloneWithRows(LIST_ARRAY),
-        });
-    }
-
     getLatestProjects() {
+        //调用NativeModules读取最近打开数组
         this.setState({
-            dataLatestOpenSource: this.state.dataOrgSource.cloneWithRows(LATEST_OPEN),
+            latestProjectsSource: this.state.latestProjectsSource.cloneWithRows(LATEST_OPEN),
         });
         ARRAY_TEMP = LATEST_OPEN.concat();
     }
 
+    getBundles() {
+        //获取模块
+        fetch("http://gateway.deploy.saas.hand-china.com/mobileCloud/v1/bundle/getData/2", {
+            headers: {
+                "Authorization": "Bearer eb51aa17-0148-43d5-87d3-e17254494543"
+            }
+        })
+            .then((response) => response.json())
+            .then((responseData) => {
+                this.setState({
+                    bundlesSource: this.state.bundlesSource.cloneWithRows(responseData),
+                });
+            });
+    }
+
     getCurrent() {
+        //调用NativeModules读取当前org和pro
         this.setState({
-            currentOrganization: '',
-            currentProject: ''
+            currentOrganization: {},
+            currentProject: {}
         });
     }
 
@@ -133,38 +144,27 @@ export default class FirstPage extends Component {
             currentOrganization: organization,
             organizationShow: !this.state.organizationShow
         })
-        if (this.state.list != "") {
+        if (this.state.currentBundle.id != undefined) {
             this.setState({
-                currentProject: ''
+                currentProject: {}
             });
-            console.log("触发事件打开" + organization + "项目下的" + this.state.list + "【组织层】数据")
+            this.openBundle(this.state.currentOrganization.id, '', this.state.currentBundle.id, true)
         }
     }
 
-    renderOrg(organization) {
-        var bgColor = organization.id == this.state.currentOrganization.id ? '#F3F3F3' : '#FEFEFE';
-        return (
-            <List
-                text={organization.name}
-                bgColor={bgColor}
-                onPress={() => this.selectOrganization(organization)}
-            />
-        );
-    }
+
 
     selectProject(project) {
 
-        console.log(project)
 
         //const pos = ARRAY_TEMP.indexOf(project);
         const pos = ARRAY_TEMP.findIndex(x => x.id == project.id)
-        console.log(pos)
         if (pos === -1) {
             ARRAY_TEMP.unshift(project);
             ARRAY_TEMP = ARRAY_TEMP.splice(0, 4);
             this.setState({
                 currentProject: project,
-                dataLatestOpenSource: this.state.dataLatestOpenSource.cloneWithRows(ARRAY_TEMP),
+                latestProjectsSource: this.state.latestProjectsSource.cloneWithRows(ARRAY_TEMP),
 
             });
         } else if (pos === 0) {
@@ -177,77 +177,77 @@ export default class FirstPage extends Component {
             ARRAY_TEMP = ARRAY_TEMP.splice(0, 4);
             this.setState({
                 currentProject: project,
-                dataLatestOpenSource: this.state.dataLatestOpenSource.cloneWithRows(ARRAY_TEMP),
+                latestProjectsSource: this.state.latestProjectsSource.cloneWithRows(ARRAY_TEMP),
 
             });
         }
 
-        if (this.state.list != '') {
-            console.log("触发事件打开" + this.state.currentOrganization + "项目下的" + project + "项目下的" + this.state.list + "【项目层】数据")
+        if (this.state.currentBundle.id != undefined) {
+            this.openBundle(project.organizationId, project.id, this.state.currentBundle.id, true)
         }
     }
 
-    selectList(list) {
+    selectBundle(bundle) {
         this.setState({
-            list: list.name
+            currentBundle: bundle
         });
-        if (this.state.currentOrganization != '' && this.state.currentProject != '') {
-            console.log("触发事件打开" + this.state.currentOrganization + "项目下的" + this.state.currentProject + "项目下的" + list.name + "【项目层】数据")
-        } else if (this.state.currentOrganization != '' && this.state.currentProject === '') {
-            console.log("触发事件打开" + this.state.currentOrganization + "项目下的" + list.name + "【组织层】数据")
+        if (this.state.currentOrganization.id != undefined && this.state.currentProject.id != undefined) {
+            this.openBundle(this.state.currentOrganization.id, this.state.currentProject.id, bundle.id, true)
+        } else if (this.state.currentOrganization.id != undefined && this.state.currentProject.id === undefined) {
+            this.openBundle(this.state.currentOrganization.id, '', bundle.id, true)
         }
-        console.log(ARRAY_TEMP)
     }
 
-    renderListLatestOpen(project) {
-        var bgColor = project == this.state.currentProject ? '#F3F3F3' : '#FEFEFE';
+    renderOrganization(organization) {
+        var bgColor = organization.id == this.state.currentOrganization.id ? '#F3F3F3' : '#FEFEFE';
+        return (
+            <List
+                text={organization.name}
+                bgColor={bgColor}
+                onPress={() => this.selectOrganization(organization)}
+            />
+        );
+    }
+
+    renderLatestProject(project) {
+        var bgColor = project.id == this.state.currentProject.id ? '#F3F3F3' : '#FEFEFE';
         return (
             <List
                 text={project.name}
                 bgColor={bgColor}
-                onPress={() => {
-                    this.setState({
-                        currentProject: project
-                    });
-                    this.selectProject(project);
-                    this.openFromMenu(this.state.currentProject, this.state.currentOrganization, project, false);
-                }}
+                onPress={() => this.selectProject(project)}
             />
         )
     }
 
-    renderList(list) {
-        var bgColor = list.name == this.state.list ? '#F3F3F3' : '#FEFEFE';
+    renderBundle(bundle) {
+        var bgColor = bundle.id == this.state.currentBundle.id ? '#F3F3F3' : '#FEFEFE';
 
         return (
             <List
-                text={list.name}
-                leftIconName={list.icon}
+                text={bundle.nameCn}
+                leftIconName={bundle.icon}
                 listHeight={46}
                 bgColor={bgColor}
-                onPress={() => {
-                    this.selectList(list)
-                }}
+                onPress={() => this.selectBundle(bundle)}
             />
         );
     }
 
 
 
-    openFromMenu(listName, orgId, proId, isClose) {
-        //var orgId = this.state.organization;
-        //var proId = this.state.project
-        //var proId = `${this.props.navigation.state.params ? this.props.navigation.state.params.project : '全部项目'}`;
-        // if (proId === '全部项目') {
-        //     alert("请选择项目");
-        // } else {
-        //alert(bundleName + '-' + orgId + '-' + proId);
+    openBundle(organizationId, projectId, bundleId, isClose) {
         //打开子模块
         //=====================================================================================================================
-        //NativeModules.NativeManager.openFromMenuNew(listName, orgId, proId, isClose);
+        //NativeModules.NativeManager.openFromMenuNew(organizationId, projectId, bundleId, isClose);
         //=====================================================================================================================
 
         //}
+        console.log(
+            "organization:" + organizationId +
+            "projectId:" + projectId +
+            "bundleId:" + bundleId
+        )
     }
 
     render() {
@@ -302,8 +302,8 @@ export default class FirstPage extends Component {
                     this.state.organizationShow &&
                     <View style={{ height: height }}>
                         <ListView
-                            dataSource={this.state.dataOrgSource}
-                            renderRow={this.renderOrg.bind(this)}
+                            dataSource={this.state.organizationsSource}
+                            renderRow={this.renderOrganization.bind(this)}
                         />
                     </View>
                 }
@@ -317,8 +317,8 @@ export default class FirstPage extends Component {
                             activeOpacity={1}
                         />
                         <ListView
-                            dataSource={this.state.dataLatestOpenSource}
-                            renderRow={this.renderListLatestOpen.bind(this)}
+                            dataSource={this.state.latestProjectsSource}
+                            renderRow={this.renderLatestProject.bind(this)}
                         />
 
                         <List
@@ -330,8 +330,8 @@ export default class FirstPage extends Component {
                         />
                         <View style={styles.listBottomBorder}></View>
                         <ListView
-                            dataSource={this.state.dataListSource}
-                            renderRow={this.renderList.bind(this)}
+                            dataSource={this.state.bundlesSource}
+                            renderRow={this.renderBundle.bind(this)}
                         />
                     </View>
                 }

@@ -18,37 +18,66 @@ const propTypes = {
     activeOpacity: PropTypes.number,
     underlayColor: PropTypes.string,
     onPress: PropTypes.func,
+    disable: PropTypes.bool
 };
 
 const List = ({
-  leftIconName, iconSize, iconColor, text, textSize, textColor, rightIconName, listHeight, overlayMarginTop, bgColor, hightLight, activeOpacity, underlayColor, onPress
+  leftIconName, iconSize, iconColor, text, textSize, textColor, rightIconName, listHeight, overlayMarginTop, bgColor, hightLight, activeOpacity, underlayColor, onPress, disable
 }) => (
-        <TouchableHighlight
-            underlayColor={underlayColor}
-            activeOpacity={activeOpacity}
-            onPress={onPress}
-        >
-            <View style={[style.list, { marginTop: overlayMarginTop, height: listHeight, backgroundColor: bgColor }]}>
-                {
-                    leftIconName != '' &&
-                    <View style={style.listIcon}>
-                        <Icon name={leftIconName} size={iconSize} color={iconColor} />
-                    </View>
-                }
+        <View>
+            {
+                disable &&
+                <View style={[style.list, { marginTop: overlayMarginTop, height: listHeight, backgroundColor: bgColor }]}>
+                    {
+                        leftIconName != '' &&
+                        <View style={style.listIcon}>
+                            <Icon name={leftIconName} size={iconSize} color={iconColor} />
+                        </View>
+                    }
 
-                <View style={style.listContent}>
-                    <View>
-                        <Text style={{ fontSize: textSize, color: textColor }}>{text}</Text>
-                    </View>
-                    <View style={{ alignItems: 'center', width: 23, flexDirection: 'row' }}>
-                        {
-                            rightIconName != '' &&
-                            <Icon name={rightIconName} size={iconSize} color={iconColor} />
-                        }
+                    <View style={style.listContent}>
+                        <View>
+                            <Text style={{ fontSize: textSize, color: textColor }}>{text}</Text>
+                        </View>
+                        <View style={{ alignItems: 'center', width: 23, flexDirection: 'row' }}>
+                            {
+                                rightIconName != '' &&
+                                <Icon name={rightIconName} size={iconSize} color={iconColor} />
+                            }
+                        </View>
                     </View>
                 </View>
-            </View>
-        </TouchableHighlight>
+            }
+            {
+                !disable &&
+                < TouchableHighlight
+                    underlayColor={underlayColor}
+                    activeOpacity={activeOpacity}
+                    onPress={onPress}
+                >
+                    <View style={[style.list, { marginTop: overlayMarginTop, height: listHeight, backgroundColor: bgColor }]}>
+                        {
+                            leftIconName != '' &&
+                            <View style={style.listIcon}>
+                                <Icon name={leftIconName} size={iconSize} color={iconColor} />
+                            </View>
+                        }
+
+                        <View style={style.listContent}>
+                            <View>
+                                <Text style={{ fontSize: textSize, color: textColor }}>{text}</Text>
+                            </View>
+                            <View style={{ alignItems: 'center', width: 23, flexDirection: 'row' }}>
+                                {
+                                    rightIconName != '' &&
+                                    <Icon name={rightIconName} size={iconSize} color={iconColor} />
+                                }
+                            </View>
+                        </View>
+                    </View>
+                </TouchableHighlight >
+            }
+        </View>
     );
 
 List.propTypes = propTypes;
@@ -65,7 +94,8 @@ List.defaultProps = {
     hightLight: false,
     activeOpacity: 0.65,
     underlayColor: '#F3F3F3',
-    onPress() { }
+    onPress() { },
+    disable: false
 };
 
 var style = StyleSheet.create({

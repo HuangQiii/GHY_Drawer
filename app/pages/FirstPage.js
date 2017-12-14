@@ -1,5 +1,5 @@
 import React, { Component, } from 'react';
-import { View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight, DeviceEventEmitter } from 'react-native';
+import { AppState, View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight, DeviceEventEmitter } from 'react-native';
 import { NativeModules } from 'react-native';
 import List from '../components/List';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -162,10 +162,12 @@ export default class FirstPage extends Component {
 
     renderListLatestOpen(project) {
         var bgColor = project == this.state.currentProject ? '#F3F3F3' : '#FEFEFE';
+        var disable = project == this.state.currentProject ? true : false;
         return (
             <List
                 text={project}
                 bgColor={bgColor}
+                disable={disable}
                 onPress={() => {
                     this.setState({
                         currentProject: project
@@ -179,10 +181,11 @@ export default class FirstPage extends Component {
 
     renderList(list) {
         var bgColor = list.name == this.state.list ? '#F3F3F3' : '#FEFEFE';
-
+        var disable = list.name == this.state.list ? true : false;
         return (
             <List
                 text={list.name}
+                disable={disable}
                 leftIconName={list.icon}
                 listHeight={46}
                 bgColor={bgColor}

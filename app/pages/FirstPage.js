@@ -1,5 +1,5 @@
 import React, { Component, } from 'react';
-import { AppState, View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight, DeviceEventEmitter, Alert } from 'react-native';
+import { AppState, View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight, DeviceEventEmitter, Alert, ToastAndroid } from 'react-native';
 import { NativeModules, NetInfo } from 'react-native';
 import List from '../components/List';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -9,6 +9,10 @@ const LATEST_OPEN = [];
 const LIST_ARRAY = [];
 const ARRAY_TEMP = [];
 const { width, height } = Dimensions.get('window');
+// const token = "Bearer 98907fb8-39f7-4e07-afed-3f73c6462296";
+const token = "";
+// const baseUrl = 'http://gateway.deploy.saas.hand-china.com';
+const baseUrl = "";
 export default class FirstPage extends Component {
 
     constructor(props) {
@@ -33,8 +37,15 @@ export default class FirstPage extends Component {
     }
 
     componentDidMount() {
-        DeviceEventEmitter.addListener('chooseProject', (project) => { this.selectProject(project); });
-        this.getMessage();
+        NativeModules.NativeManager.getConfigData((back) => {
+            baseUrl = back.mainUrl;
+            console.log(baseUrl);
+            token = back.token;
+            console.log(token);
+            DeviceEventEmitter.addListener('chooseProject', (project) => { this.selectProject(project); });
+            this.getMessage();
+        });
+
     }
 
     componentWillUnmount() {
@@ -57,9 +68,10 @@ export default class FirstPage extends Component {
     }
 
     getUserMessage() {
-        fetch("http://gateway.deploy.saas.hand-china.com/uaa/v1/users/querySelf", {
+        var url = baseUrl + '/uaa/v1/users/querySelf';
+        fetch(url, {
             headers: {
-                "Authorization": "Bearer eb51aa17-0148-43d5-87d3-e17254494543"
+                "Authorization": token
             }
         })
             .then((response) => response.json())
@@ -70,10 +82,10 @@ export default class FirstPage extends Component {
                     userEmail: responseData.email,
                 })
 
-                var url = "http://gateway.deploy.saas.hand-china.com/uaa/v1/organizations/" + responseData.organizationId
+                var url = baseUrl + "/uaa/v1/organizations/" + responseData.organizationId
                 fetch(url, {
                     headers: {
-                        "Authorization": "Bearer eb51aa17-0148-43d5-87d3-e17254494543"
+                        "Authorization": token
                     }
                 })
                     .then((res) => res.json())
@@ -87,16 +99,29 @@ export default class FirstPage extends Component {
     }
 
     getOrganizations() {
-        fetch("http://gateway.deploy.saas.hand-china.com/uaa/v1/menus/select", {
+        var url = baseUrl + '/uaa/v1/menus/select';
+        fetch(url, {
             headers: {
-                "Authorization": "Bearer eb51aa17-0148-43d5-87d3-e17254494543"
+                "Authorization": token
             }
         })
             .then((response) => response.json())
             .then((responseData) => {
-                this.setState({
-                    organizationsSource: this.state.organizationsSource.cloneWithRows(responseData.organizations)
-                })
+                console.log("*********组织");
+                console.log(responseData);
+                if (responseData.error == undefined) {
+                    this.setState({
+                        organizationsSource: this.state.organizationsSource.cloneWithRows(responseData.organizations)
+                    })
+                } else if (responseData.error == "invalid_token") {
+                    //token失效
+                    ToastAndroid.show("登录失效", ToastAndroid.SHORT);
+                    this.openLogin();
+                } else {
+                    // this.loadLoaclData();
+                    // arr = arr.concat(responseData);
+                    ToastAndroid.show("网络错误", ToastAndroid.SHORT);
+                }
             });
     }
 
@@ -126,16 +151,39 @@ export default class FirstPage extends Component {
 
     getBundles() {
         //获取模块
-        fetch("http://gateway.deploy.saas.hand-china.com/mobileCloud/v1/bundle/getData/2", {
+        var objHome = {};
+        objHome.id = -1;
+        objHome.name = '首页';
+        objHome.iconName = '';
+        var arr = [];
+        arr.push(objHome);
+        var url = baseUrl + '/mobileCloud/v1/bundle/getData/2'
+        fetch(url, {
             headers: {
-                "Authorization": "Bearer eb51aa17-0148-43d5-87d3-e17254494543"
+                "Authorization": token
             }
         })
             .then((response) => response.json())
             .then((responseData) => {
-                this.setState({
-                    bundlesSource: this.state.bundlesSource.cloneWithRows(responseData),
-                });
+                console.log("*********模块");
+                console.log(responseData);
+                if (responseData.error == undefined) {
+                    arr = arr.concat(responseData);
+                    this.setState({
+                        bundlesSource: this.state.bundlesSource.cloneWithRows(arr),
+                    });
+                } else if (responseData.error == "invalid_token") {
+                    //token失效
+                    ToastAndroid.show("登录失效", ToastAndroid.SHORT);
+                    this.openLogin();
+                } else {
+                    // this.loadLoaclData();
+                    // arr = arr.concat(responseData);
+                    ToastAndroid.show("网络错误", ToastAndroid.SHORT);
+                    this.setState({
+                        bundlesSource: this.state.bundlesSource.cloneWithRows(arr),
+                    });
+                }
             });
     }
 
@@ -186,9 +234,6 @@ export default class FirstPage extends Component {
     }
 
     selectBundle(bundle) {
-        this.setState({
-            currentBundle: bundle
-        });
         var orgId = -1;
         var proId = -1;
         if (this.state.currentOrganization.id != undefined) {
@@ -199,65 +244,71 @@ export default class FirstPage extends Component {
         }
         //判断是否下载
         NativeModules.NativeManager.openBundle(bundle.name, orgId, proId, (type, result) => {
-            let title = ""
-            if (type == "update") {
-                title = "发现新版本,是否升级?" + result;
+            if (type == 'opened') {
+                this.setState({
+                    currentBundle: bundle
+                });
             } else {
-                title = "未安装应用，是否安装？"
-            }
-            Alert.alert(
-                title,
-                title,
-                [
-                    {
-                        text: '是',
-                        onPress: () => {
-                            NetInfo.fetch().done((connectionInfo) => {
-                                //var connectionType = connectionInfo.type;
-                                // if (connectionType == 'wifi') {
-                                if (connectionInfo == 'WIFI') {
-                                    NativeModules.NativeManager.downloadAndOpenBundle(bundle.name, bundle.id, bundle.currentVersion, bundle.downloadUrl, (type, result) => {
-                                        if (type == "netError") {
-                                            Alert.alert("网络或服务器出错，请重启软件再尝试！");
-                                        } else if (type == "success") {
+                let title = ""
+                if (type == "update") {
+                    title = "发现新版本,是否升级?" + result;
+                } else {
+                    title = "未安装应用，是否安装？"
+                }
+                Alert.alert(
+                    title,
+                    title,
+                    [
+                        {
+                            text: '是',
+                            onPress: () => {
+                                NetInfo.fetch().done((connectionInfo) => {
+                                    //var connectionType = connectionInfo.type;
+                                    // if (connectionType == 'wifi') {
+                                    if (connectionInfo == 'WIFI') {
+                                        NativeModules.NativeManager.downloadAndOpenBundle(bundle.name, bundle.id, bundle.currentVersion, bundle.downloadUrl, (type, result) => {
+                                            if (type == "netError") {
+                                                Alert.alert("网络或服务器出错，请重启软件再尝试！");
+                                            } else if (type == "success") {
 
-                                        } else {
-                                            Alert.alert(result);
-                                        }
-                                    });
-                                } else {
-                                    Alert.alert(
-                                        "提示",
-                                        "当前正在使用非wifi连接下载，确定要下载吗？",
-                                        [
-                                            {
-                                                text: '是',
-                                                onPress: () => {
-                                                    NativeModules.NativeManager.downloadAndOpenBundle(bundle.name, bundle.id, bundle.currentVersion, bundle.downloadUrl, (type, result) => {
-                                                        if (type == "netError") {
-                                                            Alert.alert("网络或服务器出错，请重启软件再尝试！");
-                                                        } else if (type == "success") {
-
-                                                        } else {
-                                                            Alert.alert(result);
-                                                        }
-                                                    });
-                                                }
-                                            },
-                                            {
-                                                text: '否'
+                                            } else {
+                                                Alert.alert(result);
                                             }
-                                        ]
-                                    )
-                                }
-                            });
+                                        });
+                                    } else {
+                                        Alert.alert(
+                                            "提示",
+                                            "当前正在使用非wifi连接下载，确定要下载吗？",
+                                            [
+                                                {
+                                                    text: '是',
+                                                    onPress: () => {
+                                                        NativeModules.NativeManager.downloadAndOpenBundle(bundle.name, bundle.id, bundle.currentVersion, bundle.downloadUrl, (type, result) => {
+                                                            if (type == "netError") {
+                                                                Alert.alert("网络或服务器出错，请重启软件再尝试！");
+                                                            } else if (type == "success") {
+
+                                                            } else {
+                                                                Alert.alert(result);
+                                                            }
+                                                        });
+                                                    }
+                                                },
+                                                {
+                                                    text: '否'
+                                                }
+                                            ]
+                                        )
+                                    }
+                                });
+                            }
+                        },
+                        {
+                            text: '否'
                         }
-                    },
-                    {
-                        text: '否'
-                    }
-                ]
-            );
+                    ]
+                );
+            }
             // }
         });
         // if (this.state.currentOrganization.id != undefined && this.state.currentProject.id != undefined) {
@@ -280,10 +331,12 @@ export default class FirstPage extends Component {
 
     renderLatestProject(project) {
         var bgColor = project.id == this.state.currentProject.id ? '#F3F3F3' : '#FEFEFE';
+        var disable = project.id == this.state.currentProject.id ? true : false;
         return (
             <List
                 text={project.name}
                 bgColor={bgColor}
+                disable={disable}
                 onPress={() => this.selectProject(project)}
             />
         )
@@ -291,13 +344,14 @@ export default class FirstPage extends Component {
 
     renderBundle(bundle) {
         var bgColor = bundle.id == this.state.currentBundle.id ? '#F3F3F3' : '#FEFEFE';
-
+        var disable = bundle.id == this.state.currentBundle.id ? true : false;
         return (
             <List
                 text={bundle.name}
                 leftIconName={bundle.icon}
                 listHeight={46}
                 bgColor={bgColor}
+                disable={disable}
                 onPress={() => this.selectBundle(bundle)}
             />
         );

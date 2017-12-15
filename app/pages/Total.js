@@ -5,6 +5,10 @@ import Button from '../components/Button';
 import Icon from 'react-native-vector-icons/Ionicons';
 
 const PRE_PRO = ['请回答2017', '摄影大赛', '柴火开发', '柳交所'];
+// const token = "Bearer 98907fb8-39f7-4e07-afed-3f73c6462296";
+const token = "";
+// const baseUrl = 'http://gateway.deploy.saas.hand-china.com';
+const baseUrl = "";
 export default class Total extends Component {
 
     static navigationOptions = ({ navigation }) => ({
@@ -28,21 +32,39 @@ export default class Total extends Component {
     }
 
     componentDidMount() {
-        this.getProjects();
+        NativeModules.NativeManager.getConfigData((back) => {
+            baseUrl = back.mainUrl;
+            console.log(baseUrl);
+            token = back.token;
+            console.log(token);
+            this.getProjects();
+        });
     }
     //获取projects数据
     getProjects() {
-        var url = "http://gateway.deploy.saas.hand-china.com/uaa/v1/organization/" + this.props.navigation.state.params.currentOrganization.id + "/projects/self";
+        var url = baseUrl + "/uaa/v1/organization/" + this.props.navigation.state.params.currentOrganization.id + "/projects/self";
         fetch(url, {
             headers: {
-                "Authorization": "Bearer eb51aa17-0148-43d5-87d3-e17254494543"
+                "Authorization": token
             }
         })
             .then((response) => response.json())
             .then((responseData) => {
-                this.setState({
-                    dataSource: this.state.dataSource.cloneWithRows(responseData)
-                })
+                console.log("*********项目");
+                console.log(responseData);
+                if (responseData.error == undefined) {
+                    this.setState({
+                        dataSource: this.state.dataSource.cloneWithRows(responseData)
+                    })
+                } else if (responseData.error == "invalid_token") {
+                    //token失效
+                    ToastAndroid.show("登录失效", ToastAndroid.SHORT);
+                    this.openLogin();
+                } else {
+                    // this.loadLoaclData();
+                    // arr = arr.concat(responseData);
+                    ToastAndroid.show("网络错误", ToastAndroid.SHORT);
+                }
             });
     }
 

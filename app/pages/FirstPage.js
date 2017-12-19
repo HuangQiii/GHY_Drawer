@@ -29,6 +29,7 @@ export default class FirstPage extends Component {
             latestProjectsSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
             currentBundle: {},
             bundlesSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
+            downloading: []
         };
     }
 
@@ -155,8 +156,14 @@ export default class FirstPage extends Component {
         objHome.id = -1;
         objHome.name = '首页';
         objHome.iconName = '';
+        //暂时添加洞察模块为自带
+        var objAnalysis = {}
+        objAnalysis.id = -2;
+        objAnalysis.name = '智能洞察';
+        objAnalysis.iconName = '';
         var arr = [];
         arr.push(objHome);
+        arr.push(objAnalysis);
         var url = baseUrl + '/mobileCloud/v1/bundle/getData/2'
         fetch(url, {
             headers: {
@@ -266,11 +273,20 @@ export default class FirstPage extends Component {
                                     //var connectionType = connectionInfo.type;
                                     // if (connectionType == 'wifi') {
                                     if (connectionInfo == 'WIFI') {
+                                        var arr = this.state.downloading.concat();
+                                        arr.push(bundle.id);
+                                        this.setState({
+                                            downloading: arr
+                                        });
                                         NativeModules.NativeManager.downloadAndOpenBundle(bundle.name, bundle.id, bundle.currentVersion, bundle.downloadUrl, (type, result) => {
                                             if (type == "netError") {
                                                 Alert.alert("网络或服务器出错，请重启软件再尝试！");
                                             } else if (type == "success") {
-
+                                                var arr = this.state.downloading;
+                                                arr.splice(arr.indexOf(bundle.id), 1);
+                                                this.setState({
+                                                    downloading: arr
+                                                });
                                             } else {
                                                 Alert.alert(result);
                                             }
@@ -283,11 +299,20 @@ export default class FirstPage extends Component {
                                                 {
                                                     text: '是',
                                                     onPress: () => {
+                                                        var arr = this.state.downloading.concat();
+                                                        arr.push(bundle.id);
+                                                        this.setState({
+                                                            downloading: arr
+                                                        });
                                                         NativeModules.NativeManager.downloadAndOpenBundle(bundle.name, bundle.id, bundle.currentVersion, bundle.downloadUrl, (type, result) => {
                                                             if (type == "netError") {
                                                                 Alert.alert("网络或服务器出错，请重启软件再尝试！");
                                                             } else if (type == "success") {
-
+                                                                var arr = this.state.downloading;
+                                                                arr.splice(arr.indexOf(bundle.id), 1);
+                                                                this.setState({
+                                                                    downloading: arr
+                                                                });
                                                             } else {
                                                                 Alert.alert(result);
                                                             }
@@ -344,7 +369,8 @@ export default class FirstPage extends Component {
 
     renderBundle(bundle) {
         var bgColor = bundle.id == this.state.currentBundle.id ? '#F3F3F3' : '#FEFEFE';
-        var disable = bundle.id == this.state.currentBundle.id ? true : false;
+        var disable = bundle.id == this.state.currentBundle.id || this.state.downloading.indexOf(bundle.id) >= 0 ? true : false;
+        var downloading = this.state.downloading.indexOf(bundle.id) >= 0 ? true : false;
         return (
             <List
                 text={bundle.name}
@@ -353,6 +379,7 @@ export default class FirstPage extends Component {
                 bgColor={bgColor}
                 disable={disable}
                 onPress={() => this.selectBundle(bundle)}
+                downloading={downloading}
             />
         );
     }

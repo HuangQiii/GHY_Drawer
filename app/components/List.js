@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ViewPropTypes, View, Text, StyleSheet, TouchableHighlight } from 'react-native';
+import { ViewPropTypes, View, Text, StyleSheet, TouchableHighlight, ActivityIndicator } from 'react-native';
 
 const propTypes = {
     leftIconName: PropTypes.string,
@@ -18,37 +18,83 @@ const propTypes = {
     activeOpacity: PropTypes.number,
     underlayColor: PropTypes.string,
     onPress: PropTypes.func,
+    disable: PropTypes.bool,
+    downloading: PropTypes.bool,
 };
 
 const List = ({
-  leftIconName, iconSize, iconColor, text, textSize, textColor, rightIconName, listHeight, overlayMarginTop, bgColor, hightLight, activeOpacity, underlayColor, onPress
+  leftIconName, iconSize, iconColor, text, textSize, textColor, rightIconName, listHeight, overlayMarginTop, bgColor, hightLight, activeOpacity, underlayColor, onPress, disable, downloading
 }) => (
-        <TouchableHighlight
-            underlayColor={underlayColor}
-            activeOpacity={activeOpacity}
-            onPress={onPress}
-        >
-            <View style={[style.list, { marginTop: overlayMarginTop, height: listHeight, backgroundColor: bgColor }]}>
-                {
-                    leftIconName != '' &&
-                    <View style={style.listIcon}>
-                        <Icon name={leftIconName} size={iconSize} color={iconColor} />
-                    </View>
-                }
+        <View>
+            {
+                disable &&
+                <View style={[style.list, { marginTop: overlayMarginTop, height: listHeight, backgroundColor: bgColor }]}>
+                    {
+                        leftIconName != '' &&
+                        <View style={style.listIcon}>
+                            <Icon name={leftIconName} size={iconSize} color={iconColor} />
+                        </View>
+                    }
 
-                <View style={style.listContent}>
-                    <View>
-                        <Text style={{ fontSize: textSize, color: textColor }}>{text}</Text>
-                    </View>
-                    <View style={{ alignItems: 'center', width: 23, flexDirection: 'row' }}>
-                        {
-                            rightIconName != '' &&
-                            <Icon name={rightIconName} size={iconSize} color={iconColor} />
-                        }
+                    <View style={style.listContent}>
+                        <View>
+                            <Text style={{ fontSize: textSize, color: textColor }}>{text}</Text>
+                        </View>
+                        <View style={{ alignItems: 'center', width: 23, flexDirection: 'row' }}>
+                            {
+                                rightIconName != '' &&
+                                <Icon name={rightIconName} size={iconSize} color={iconColor} />
+                            }
+                            {
+                                downloading &&
+                                <ActivityIndicator
+                                    animating={true}
+                                    size="small"
+                                    color={'#3F51B5'}
+                                />
+                            }
+                        </View>
                     </View>
                 </View>
-            </View>
-        </TouchableHighlight>
+            }
+            {
+                !disable &&
+                < TouchableHighlight
+                    underlayColor={underlayColor}
+                    activeOpacity={activeOpacity}
+                    onPress={onPress}
+                >
+                    <View style={[style.list, { marginTop: overlayMarginTop, height: listHeight, backgroundColor: bgColor }]}>
+                        {
+                            leftIconName != '' &&
+                            <View style={style.listIcon}>
+                                <Icon name={leftIconName} size={iconSize} color={iconColor} />
+                            </View>
+                        }
+
+                        <View style={style.listContent}>
+                            <View>
+                                <Text style={{ fontSize: textSize, color: textColor }}>{text}</Text>
+                            </View>
+                            <View style={{ alignItems: 'center', width: 23, flexDirection: 'row' }}>
+                                {
+                                    rightIconName != '' &&
+                                    <Icon name={rightIconName} size={iconSize} color={iconColor} />
+                                }
+                                {
+                                    downloading &&
+                                    <ActivityIndicator
+                                        animating={true}
+                                        size="small"
+                                        color={'#3F51B5'}
+                                    />
+                                }
+                            </View>
+                        </View>
+                    </View>
+                </TouchableHighlight >
+            }
+        </View>
     );
 
 List.propTypes = propTypes;
@@ -65,7 +111,9 @@ List.defaultProps = {
     hightLight: false,
     activeOpacity: 0.65,
     underlayColor: '#F3F3F3',
-    onPress() { }
+    onPress() { },
+    disable: false,
+    downloading: false
 };
 
 var style = StyleSheet.create({

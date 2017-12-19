@@ -31,6 +31,7 @@ export default class FirstPage extends Component {
             dataLatestOpenSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
             list: '',
             dataListSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
+            loading: [],
         };
     }
     componentWillMount() {
@@ -150,14 +151,24 @@ export default class FirstPage extends Component {
     }
 
     selectList(list) {
+        var arr = this.state.loading.concat();
+        arr.push(list.name);
         this.setState({
-            list: list.name
+            list: list.name,
+            loading: arr
         });
         if (this.state.currentOrganization != '' && this.state.currentProject != '') {
             console.log("触发事件打开" + this.state.currentOrganization + "项目下的" + this.state.currentProject + "项目下的" + list.name + "【项目层】数据")
         } else if (this.state.currentOrganization != '' && this.state.currentProject === '') {
             console.log("触发事件打开" + this.state.currentOrganization + "项目下的" + list.name + "【组织层】数据")
         }
+        setTimeout(() => {
+            var arr = this.state.loading;
+            arr.splice(arr.indexOf(list.name), 1);
+            this.setState({
+                loading: arr
+            });
+        }, 5000);
     }
 
     renderListLatestOpen(project) {
@@ -182,9 +193,11 @@ export default class FirstPage extends Component {
     renderList(list) {
         var bgColor = list.name == this.state.list ? '#F3F3F3' : '#FEFEFE';
         var disable = list.name == this.state.list ? true : false;
+        var loading = this.state.loading.indexOf(list.name) >= 0 ? true : false;
         return (
             <List
                 text={list.name}
+                loading={loading}
                 disable={disable}
                 leftIconName={list.icon}
                 listHeight={46}

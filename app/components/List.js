@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { ViewPropTypes, View, Text, StyleSheet, TouchableHighlight } from 'react-native';
+import { ViewPropTypes, View, Text, StyleSheet, TouchableHighlight, ActivityIndicator } from 'react-native';
 
 const propTypes = {
     leftIconName: PropTypes.string,
@@ -18,11 +18,12 @@ const propTypes = {
     activeOpacity: PropTypes.number,
     underlayColor: PropTypes.string,
     onPress: PropTypes.func,
-    disable: PropTypes.bool
+    disable: PropTypes.bool,
+    loading: PropTypes.bool,
 };
 
 const List = ({
-  leftIconName, iconSize, iconColor, text, textSize, textColor, rightIconName, listHeight, overlayMarginTop, bgColor, hightLight, activeOpacity, underlayColor, onPress, disable
+  leftIconName, iconSize, iconColor, text, textSize, textColor, rightIconName, listHeight, overlayMarginTop, bgColor, hightLight, activeOpacity, underlayColor, onPress, disable, loading
 }) => (
         <View>
             {
@@ -43,6 +44,14 @@ const List = ({
                             {
                                 rightIconName != '' &&
                                 <Icon name={rightIconName} size={iconSize} color={iconColor} />
+                            }
+                            {
+                                loading &&
+                                <ActivityIndicator
+                                    animating={true}
+                                    size="small"
+                                    color={'#fab614'}
+                                />
                             }
                         </View>
                     </View>
@@ -72,6 +81,14 @@ const List = ({
                                     rightIconName != '' &&
                                     <Icon name={rightIconName} size={iconSize} color={iconColor} />
                                 }
+                                {
+                                    loading &&
+                                    <ActivityIndicator
+                                        animating={true}
+                                        size="small"
+                                        color={'#fab614'}
+                                    />
+                                }
                             </View>
                         </View>
                     </View>
@@ -95,7 +112,8 @@ List.defaultProps = {
     activeOpacity: 0.65,
     underlayColor: '#F3F3F3',
     onPress() { },
-    disable: false
+    disable: false,
+    loading: false,
 };
 
 var style = StyleSheet.create({

@@ -1,18 +1,25 @@
 import React, { Component, } from 'react';
-import { AppState, View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight, DeviceEventEmitter, NetInfo } from 'react-native';
+import { ScrollView, AppState, View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight, DeviceEventEmitter, NetInfo } from 'react-native';
 import { NativeModules } from 'react-native';
 import List from '../components/List';
+import Loading from '../components/Loading';
 import Icon from 'react-native-vector-icons/Ionicons';
 import SplashScreen from 'react-native-splash-screen'
 
-const PRE_ORG = ['开发部', '设计部', '软件园', '学苑', '新闻网', '生活网', '音乐网', '办公室', '运营部', '自媒体中心'];
+const PRE_ORG = new Array(20).fill('Hello');
 const LATEST_OPEN = ['柴火开发', '柳交所', '摄影大赛'];
 const LIST_ARRAY = [
     { name: '首页查询', icon: 'md-home' },
     { name: '进度跟进', icon: 'md-eye' },
     { name: '任务分配', icon: 'md-briefcase' },
     { name: '交流中心', icon: 'md-contact' },
-    { name: '事后总结', icon: 'md-settings' }];
+    { name: '事后总结', icon: 'md-settings' },
+    { name: '1', icon: 'md-home' },
+    { name: '2', icon: 'md-eye' },
+    { name: '3', icon: 'md-briefcase' },
+    { name: '4', icon: 'md-contact' },
+    { name: '5', icon: 'md-settings' },
+];
 const ARRAY_TEMP = [];
 let CONNECT_BOOL;
 const { width, height } = Dimensions.get('window');
@@ -32,7 +39,8 @@ export default class FirstPage extends Component {
             dataLatestOpenSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
             list: '',
             dataListSource: new ListView.DataSource({ rowHasChanged: (row1, row2) => row1 !== row2 }),
-            loading: [],
+            downloading: [],
+            loading: true,
         };
     }
     componentWillMount() {
@@ -93,9 +101,12 @@ export default class FirstPage extends Component {
     }
 
     getBundles() {
-        this.setState({
-            dataListSource: this.state.dataOrgSource.cloneWithRows(LIST_ARRAY),
-        });
+        setTimeout(() => {
+            this.setState({
+                loading: false,
+                dataListSource: this.state.dataOrgSource.cloneWithRows(LIST_ARRAY),
+            });
+        }, 5000);
     }
 
     getLatestProjects() {
@@ -167,11 +178,11 @@ export default class FirstPage extends Component {
     }
 
     selectList(list) {
-        var arr = this.state.loading.concat();
+        var arr = this.state.downloading.concat();
         arr.push(list.name);
         this.setState({
             list: list.name,
-            loading: arr
+            downloading: arr
         });
         if (this.state.currentOrganization != '' && this.state.currentProject != '') {
             console.log("触发事件打开" + this.state.currentOrganization + "项目下的" + this.state.currentProject + "项目下的" + list.name + "【项目层】数据")
@@ -179,10 +190,10 @@ export default class FirstPage extends Component {
             console.log("触发事件打开" + this.state.currentOrganization + "项目下的" + list.name + "【组织层】数据")
         }
         setTimeout(() => {
-            var arr = this.state.loading;
+            var arr = this.state.downloading;
             arr.splice(arr.indexOf(list.name), 1);
             this.setState({
-                loading: arr
+                downloading: arr
             });
         }, 5000);
     }
@@ -209,11 +220,11 @@ export default class FirstPage extends Component {
     renderList(list) {
         var bgColor = list.name == this.state.list ? '#F3F3F3' : '#FEFEFE';
         var disable = list.name == this.state.list ? true : false;
-        var loading = this.state.loading.indexOf(list.name) >= 0 ? true : false;
+        var downloading = this.state.downloading.indexOf(list.name) >= 0 ? true : false;
         return (
             <List
                 text={list.name}
-                loading={loading}
+                downloading={downloading}
                 disable={disable}
                 leftIconName={list.icon}
                 listHeight={46}
@@ -247,61 +258,67 @@ export default class FirstPage extends Component {
         const { navigate } = this.props.navigation;
         return (
             <View style={styles.container}>
-                <View style={styles.topArea}>
-                    <View style={styles.topAreaBasicInformation}>
-                        <View style={styles.topAreaBasicInformationUserImage}>
-                            <Image
-                                source={{ uri: this.state.userHeadImage }}
-                                style={styles.imageStyle}
-                            />
-                        </View>
-                        <View style={styles.topAreaBasicInformationUserInformation} >
-                            <Text
-                                style={[styles.fontColorFFF, { fontSize: 16 }]}
-                                numberOfLines={1}
-                            >
-                                {this.state.userName}
-                            </Text>
-                            <Text
-                                style={[styles.fontColorFFF, { fontSize: 14 }]}
-                                numberOfLines={1}
-                            >
-                                {this.state.userEmail}
-                            </Text>
-                        </View>
-                        <View style={styles.topAreaBasicInformationSetting}>
-                            <Icon name="md-settings" size={20} color={'#FFF'} />
-                        </View>
-                    </View>
-                    <TouchableOpacity
-                        onPress={() => {
-                            if (!this.state.organizationShow) { this.getOrganizations(); }
-                            this.setState({
-                                organizationShow: !this.state.organizationShow
-                            });
-                        }}
-                    >
-                        <View style={styles.topAreaOrganizationInformation}>
-                            <View style={[styles.verticalCenter, { flex: 1, }]}>
-                                <Text style={[styles.fontColorFFF, { fontSize: 14, marginLeft: 16 }]}>{this.state.currentOrganization}</Text>
-                            </View>
-                            <View style={[styles.verticalCenter, { width: 28, }]}>
-                                <Icon name="md-arrow-dropdown" size={30} color={'#FFF'} />
-                            </View>
-                        </View>
-                    </TouchableOpacity>
-                </View>
                 {
                     this.state.organizationShow &&
-                    <View style={{ height: height }}>
-                        <ListView
-                            dataSource={this.state.dataOrgSource}
-                            renderRow={this.renderOrg.bind(this)}
-                        />
-                    </View>
+                    
+                        <ScrollView style={{ position: 'absolute', marginTop:137,top: 0, left: 0, width: width, height: height-137, backgroundColor: '#FEFEFE', zIndex: 99 }}>
+                            <ListView
+                                dataSource={this.state.dataOrgSource}
+                                renderRow={this.renderOrg.bind(this)}
+                            />
+                        </ScrollView>
+                    
                 }
-                {
-                    <View>
+                <ScrollView
+                    ref={(scrollView) => { _scrollView = scrollView; }}
+                    style={{ flex: 1, flexDirection: 'column' }}
+                >
+                    <View style={styles.topArea}>
+                        <View style={styles.topAreaBasicInformation}>
+                            <View style={styles.topAreaBasicInformationUserImage}>
+                                <Image
+                                    source={{ uri: this.state.userHeadImage }}
+                                    style={styles.imageStyle}
+                                />
+                            </View>
+                            <View style={styles.topAreaBasicInformationUserInformation} >
+                                <Text
+                                    style={[styles.fontColorFFF, { fontSize: 16 }]}
+                                    numberOfLines={1}
+                                >
+                                    {this.state.userName}
+                                </Text>
+                                <Text
+                                    style={[styles.fontColorFFF, { fontSize: 14 }]}
+                                    numberOfLines={1}
+                                >
+                                    {this.state.userEmail}
+                                </Text>
+                            </View>
+                            <View style={styles.topAreaBasicInformationSetting}>
+                                <Icon name="md-settings" size={20} color={'#FFF'} />
+                            </View>
+                        </View>
+                        <TouchableOpacity
+                            onPress={() => {
+                                if (!this.state.organizationShow) { this.getOrganizations(); }
+                                this.setState({
+                                    organizationShow: !this.state.organizationShow
+                                });
+                                _scrollView.scrollTo({x: 0, y: 0, animated: true})
+                            }}
+                        >
+                            <View style={styles.topAreaOrganizationInformation}>
+                                <View style={[styles.verticalCenter, { flex: 1, }]}>
+                                    <Text style={[styles.fontColorFFF, { fontSize: 14, marginLeft: 16 }]}>{this.state.currentOrganization}</Text>
+                                </View>
+                                <View style={[styles.verticalCenter, { width: 28, }]}>
+                                    <Icon name="md-arrow-dropdown" size={30} color={'#FFF'} />
+                                </View>
+                            </View>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={styles.bottomArea}>
                         <List
                             text={'最近打开的项目'}
                             overlayMarginTop={4}
@@ -309,11 +326,12 @@ export default class FirstPage extends Component {
                             underlayColor={'transparent'}
                             activeOpacity={1}
                         />
-                        <ListView
-                            dataSource={this.state.dataLatestOpenSource}
-                            renderRow={this.renderListLatestOpen.bind(this)}
-                        />
-
+                        <View>
+                            <ListView
+                                dataSource={this.state.dataLatestOpenSource}
+                                renderRow={this.renderListLatestOpen.bind(this)}
+                            />
+                        </View>
                         <List
                             text={'全部项目'}
                             listHeight={62}
@@ -321,14 +339,20 @@ export default class FirstPage extends Component {
                             rightIconName={'ios-arrow-forward'}
                             onPress={() => this.props.navigation.navigate('Total', { org: this.state.currentOrganization })}
                         />
-                        <View style={styles.listBottomBorder}></View>
-                        <ListView
-                            dataSource={this.state.dataListSource}
-                            renderRow={this.renderList.bind(this)}
-                        />
-                    </View>
-                }
-            </View >
+                        <View>
+                            <View style={styles.listBottomBorder}></View>
+                            {
+                                this.state.loading &&
+                                <Loading />
+                            }
+                            <ListView
+                                dataSource={this.state.dataListSource}
+                                renderRow={this.renderList.bind(this)}
+                            />
+                        </View>
+                    </View >
+                </ScrollView>
+            </View>
         );
     }
 }
@@ -336,13 +360,19 @@ export default class FirstPage extends Component {
 var styles = StyleSheet.create({
     container: {
         flex: 1,
-        height: height,
+        // height: height,
         backgroundColor: '#FEFEFE',
-        flexDirection: 'column'
+        flexDirection: 'column',
     },
     topArea: {
         height: 137,
         backgroundColor: '#Fab614'
+    },
+    bottomArea: {
+        // height: height - 137,
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'flex-start',
     },
     topAreaBasicInformation: {
         flex: 1,
@@ -393,7 +423,6 @@ var styles = StyleSheet.create({
         justifyContent: 'center'
     },
     listBottomBorder: {
-        width: width,
         height: 1,
         borderBottomWidth: 1,
         borderBottomColor: '#D3D3D3',

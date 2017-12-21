@@ -19,11 +19,11 @@ const propTypes = {
     underlayColor: PropTypes.string,
     onPress: PropTypes.func,
     disable: PropTypes.bool,
-    loading: PropTypes.bool,
+    downloading: PropTypes.bool,
 };
 
 const List = ({
-  leftIconName, iconSize, iconColor, text, textSize, textColor, rightIconName, listHeight, overlayMarginTop, bgColor, hightLight, activeOpacity, underlayColor, onPress, disable, loading
+  leftIconName, iconSize, iconColor, text, textSize, textColor, rightIconName, listHeight, overlayMarginTop, bgColor, hightLight, activeOpacity, underlayColor, onPress, disable, downloading
 }) => (
         <View>
             {
@@ -46,7 +46,7 @@ const List = ({
                                 <Icon name={rightIconName} size={iconSize} color={iconColor} />
                             }
                             {
-                                loading &&
+                                downloading &&
                                 <ActivityIndicator
                                     animating={true}
                                     size="small"
@@ -82,7 +82,7 @@ const List = ({
                                     <Icon name={rightIconName} size={iconSize} color={iconColor} />
                                 }
                                 {
-                                    loading &&
+                                    downloading &&
                                     <ActivityIndicator
                                         animating={true}
                                         size="small"
@@ -113,7 +113,7 @@ List.defaultProps = {
     underlayColor: '#F3F3F3',
     onPress() { },
     disable: false,
-    loading: false,
+    downloading: false,
 };
 
 var style = StyleSheet.create({

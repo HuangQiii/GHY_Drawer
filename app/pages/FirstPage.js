@@ -1,5 +1,5 @@
 import React, { Component, } from 'react';
-import { AppState, View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight, DeviceEventEmitter } from 'react-native';
+import { AppState, View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, TouchableHighlight, DeviceEventEmitter, NetInfo } from 'react-native';
 import { NativeModules } from 'react-native';
 import List from '../components/List';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -14,6 +14,7 @@ const LIST_ARRAY = [
     { name: '交流中心', icon: 'md-contact' },
     { name: '事后总结', icon: 'md-settings' }];
 const ARRAY_TEMP = [];
+let CONNECT_BOOL;
 const { width, height } = Dimensions.get('window');
 export default class FirstPage extends Component {
 
@@ -36,6 +37,10 @@ export default class FirstPage extends Component {
     }
     componentWillMount() {
         AppState.addEventListener('change', (appState) => { this.handleAppStateChange(appState) });
+        NetInfo.isConnected.addEventListener(
+            'connectionChange',
+            (isConnected) => { this.handleIsConnectedChange(isConnected) }
+        );
     }
     componentDidMount() {
         SplashScreen.hide();
@@ -48,6 +53,17 @@ export default class FirstPage extends Component {
     componentWillUnmount() {
         DeviceEventEmitter.removeAllListeners('chooseProject');
         AppState.removeEventListener('change', this.handleAppStateChange);
+        NetInfo.isConnected.removeEventListener(
+            'connectionChange',
+            this.handleIsConnectedChange
+        );
+    }
+    handleIsConnectedChange(isConnected) {
+        console.log('the isConnected change: ' + isConnected);
+        if (CONNECT_BOOL === false && isConnected === true) {
+            console.log('should fresh');
+        }
+        CONNECT_BOOL = isConnected;
     }
 
     handleAppStateChange(appState) {

@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { View, Dimensions, StyleSheet, Text, Image, TouchableOpacity, ListView, DeviceEventEmitter, NativeModules } from 'react-native';
+import { View, StyleSheet, ListView, DeviceEventEmitter, NativeModules } from 'react-native';
 import List from '../components/List';
 import Button from '../components/Button';
 import Loading from '../components/Loading';
 import Icon from 'react-native-vector-icons/Ionicons';
 
-const PRE_PRO = ['请回答2017', '摄影大赛', '柴火开发', '柳交所'];
-export default class Total extends Component {
+const PRE_PRO = ['A', 'B', 'C', 'D', 'E', 'F'];
+export default class SelectProjects extends Component {
 
     static navigationOptions = ({ navigation }) => ({
         title: `${navigation.state.params.org}下的所有项目`,
@@ -32,22 +32,22 @@ export default class Total extends Component {
     componentDidMount() {
         this.getProjects();
     }
-    //获取projects数据
+
     getProjects() {
         setTimeout(() => {
             this.setState({
                 loading: false,
                 dataSource: this.state.dataSource.cloneWithRows(PRE_PRO)
             })
-        }, 5000);
+        }, 3000);
     }
 
     chooseProject(project) {
         DeviceEventEmitter.emit('chooseProject', project);
         this.props.navigation.dispatch({
-            key: 'FirstPage',
+            key: 'Menu',
             type: 'BcakToCurrentScreen',
-            routeName: 'FirstPage',
+            routeName: 'Menu',
         });
     }
 

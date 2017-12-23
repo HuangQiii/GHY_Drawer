@@ -1,16 +1,16 @@
 import { StackNavigator, TabNavigator, NavigationActions } from 'react-navigation';
-import FirstPage from '../pages/FirstPage';
-import Total from '../pages/Total';
+import Menu from '../pages/Menu';
+import SelectProjects from '../pages/SelectProjects';
 
 const App = StackNavigator(
     {
-        FirstPage: {
-            screen: FirstPage,
+        Menu: {
+            screen: Menu,
             navigationOptions: {
                 header: null
             }
         },
-        Total: { screen: Total }
+        SelectProjects: { screen: SelectProjects }
     },
     {
         headerMode: 'screen',

@@ -266,13 +266,13 @@ export default class Menu extends Component {
                 >
                     <View style={styles.topArea}>
                         <View style={styles.topAreaBasicInformation}>
-                            <View style={styles.topAreaBasicInformationUserImage}>
+                            <View style={[styles.topAreaBasicInformationUserImage, { height: 81 }]}>
                                 <Image
                                     source={{ uri: this.state.userHeadImage }}
                                     style={styles.imageStyle}
                                 />
                             </View>
-                            <View style={styles.topAreaBasicInformationUserInformation} >
+                            <View style={[styles.topAreaBasicInformationUserInformation, { height: 81, justifyContent: 'flex-end' }]} >
                                 <Text
                                     style={[styles.fontColorFFF, { fontSize: 16 }]}
                                     numberOfLines={1}
@@ -286,8 +286,17 @@ export default class Menu extends Component {
                                     {this.state.userEmail}
                                 </Text>
                             </View>
-                            <View style={styles.topAreaBasicInformationSetting}>
-                                <Icon name="md-settings" size={20} color={'#FFF'} />
+                            <View style={{ justifyContent: 'space-between', height: 81, paddingTop: 16 }}>
+                                <TouchableOpacity onPress={() => console.log('refresh')}>
+                                    <View style={styles.topAreaBasicInformationSetting}>
+                                        <Icon name="md-refresh" size={20} color={'#FFF'} />
+                                    </View>
+                                </TouchableOpacity>
+                                <TouchableOpacity onPress={() => console.log('sign-out')}>
+                                    <View style={styles.topAreaBasicInformationSetting}>
+                                        <Icon name="md-log-out" size={20} color={'#FFF'} />
+                                    </View>
+                                </TouchableOpacity>
                             </View>
                         </View>
                         <TouchableOpacity

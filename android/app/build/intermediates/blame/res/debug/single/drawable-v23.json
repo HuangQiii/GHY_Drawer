@@ -2,5 +2,9 @@
     {
         "merged": "D:\\mobile-cloud\\new\\cloud-main-module\\android\\app\\build\\intermediates\\res\\merged\\debug\\drawable-v23\\abc_control_background_material.xml",
         "source": "D:\\mobile-cloud\\new\\cloud-main-module\\android\\app\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.4.0\\res\\drawable-v23\\abc_control_background_material.xml"
+    },
+    {
+        "merged": "D:\\mobile-cloud\\study\\GHY_Drawer\\android\\app\\build\\intermediates\\res\\merged\\debug\\drawable-v23\\abc_control_background_material.xml",
+        "source": "D:\\mobile-cloud\\study\\GHY_Drawer\\android\\app\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\23.0.1\\res\\drawable-v23\\abc_control_background_material.xml"
     }
 ]

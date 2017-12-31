@@ -3,7 +3,6 @@ import { ScrollView, AppState, View, Dimensions, StyleSheet, Text, Image, Toucha
 import List from '../components/List';
 import Loading from '../components/Loading';
 import Icon from 'react-native-vector-icons/Ionicons';
-import SplashScreen from 'react-native-splash-screen'
 
 const PRE_ORG = new Array(20).fill('Hello');
 const LATEST_OPEN = ['B', 'C', 'E'];
@@ -60,7 +59,6 @@ export default class Menu extends Component {
     }
 
     componentDidMount() {
-        SplashScreen.hide();
         this.getMessage();
     }
 
